@@ -1,0 +1,25 @@
+Come mai c'è bisogno di una forwarding unit?
+Qual'è la causa delle collisioni dei dati?
+Quando vengono risolte le branch? -> Nello stadio di EXECUTE
+
+ISA register-to.register: le varie istruzioni usano sempre i registri come operandi.
+
+Esistono vari registri interposti tra i vari stadi della pipeline.
+
+Si accede al register file in lettura già nello stadio di decode.
+
+Solo al fronte di salita del clock 
+
+Nei casi di stalli dovuti a branch, si può fare una branch prediction! Tiro a indovinare, comincio ad eseguire l'istruzione assumendo che il branch sia stato taken o meno
+se poi noto che ho sbagliato, ritorno indietro.
+
+Gli unici stadi in cui si modifica lo stato del processore (scrivo qualcosa e distruggo i valori precedente; sia registri che memoria) sono memory e write-back.
+
+Cosa succede nel caso di una branch prediction sbagliata. Faccio la fetch dell'istruizione giusta ed annullo l'esecuzione corrente sbagliata.
+Come si fa ad annullare l'istruzione in caso di una branch prediction sbagliata. Si fa uscire una istruzione di no-op (tutti 0 nella codifica dell'istruzione)
+verso il prossimo registro  della pipeline. -> la no-op entra nello stadio di memory e di writeback.
+
+Dipendenze come proprietà del codice. Alea/hazard come problemi della specifica microarchitettura.
+
+Una fowarding unit è semplicemente è una unità hardware che esegue un test logico su tutti gli operandi e e destinazioni e se un operando ha bisogno di una destinazione 
+gliala da (dai che lo capisci)
