@@ -32,5 +32,33 @@ riscv codifica nel codice menmonico delle istruzioni il tipo di dato trattato (e
 
 ### istruzioni store e load
 nb: differiscono in formato in quanto le store hanno due registri sorgente, mentre le load hanno un registro sorgente ed uno destinazione
+- questo è importante quando si considera la posizione degli indici dei registri nel formato delle istruzioni
+- i registri (destinazione?/sorgente?) si trova sempre nella stessa posizione
+
+dato che i registri sono a 64 bit, quando carico un dato di dimensione minore bisogna estendere il bit di segno nel caso signed, scrivere degli zeri nel caso unsigned
+- per questo motivo esitono delle load signed e unsigned
 
 
+
+### istruzioni condizionali
+le label contengono un **offset relativo** che indica di quanto bisogna spostare il pc quando si salta
+- se il salto fosse specificato come indirizzo assoluto
+    - si creerebbe una relocation entry aggiuntiva non necessaria
+    - l'indirizzo occuperebbe molti byte nell'istruzione (8 byte per macchine a 64bit)
+- l'assembler si occupa di calcolare l'offset
+
+
+
+### Come vengono rappresentate in codice macchina le istruzioni?
+
+6 formati di istruzione
+
+
+al contrario degli immediati negli altri formati di istruzione, gli immediati nelle istruzioni di branch sono sempre pari (multipli di 2)
+- questo perchè nelle istruzioni di branch stiamo modificando il pc
+- le istruzioni sono sempre grandi 4 byte o 2 per istruzioni compresse
+- non ha quindi senso saltare a indirizzi dispari
+
+
+
+jump and link => salta e salva indirizzo di ritorno nel registro destinazione
