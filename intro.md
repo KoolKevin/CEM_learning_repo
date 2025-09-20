@@ -16,7 +16,7 @@ Negli anni 2000 è arrivato il limite fisico dello spessore dell’ossido di gat
 - Se diventa troppo sottile, gli elettroni attraversano l’ossido per effetto tunnel → grandi correnti di perdita (leakage).
 - Quindi non si può più abbassare la tensione di alimentazione V senza peggiorare la stabilità e le perdite.
 
-Tuttavia si può continuare a rimpicciolire i transitor in lunghezza e larghezza 
+Tuttavia si può continuare a rimpicciolire i transitor in lunghezza e larghezza
 - il fattore capacità nella formula della potenza dinamica viene ridotto
 - la legge di moore continua ad essere valida (seppur rallentata)
 
@@ -48,20 +48,30 @@ D’ = 4D → la densità di transistor continua ad aumentare.
 P’ = 4P → qui sta la catastrofe: la potenza per unità di area esplode!
 
 
-
-
-
-
-
-
 # architetture moderne
-la differenza tra in ordine e superscalare out-of-order è puramente architetturale. Entrambe possono eseguire la stessa ISA
+ARCHITETTURA DELLA CPU
+L’architettura della CPU è definita dalla seguente terna:
+-  Il set di istruzioni
+  - architettura vista dall’utente detta anche ISA (Instruction Set Architecture) o linguaggio macchina
+- La struttura interna
+  - Uno stesso set di istruzioni può essere realizzato con strutture interne diverse (es. x86-64, ARMv8, ARMv7, RISC-V).
+- La realizzazione circuitale (**tecnologia microelettronica** impiegata nella realizzazione)
+  - La stessa struttura interna può essere realizzata con tecnologie diverse (es. Haswell, Zen, Zen2, Zen3)
 
-per continuare a scalare mantenendo l'efficenza, bisogna specializzare le architetture per un determinato workload
+
+### Microarchitettura
+- implementazione dell'ISA.
+- microarchitetture diverse possono implementare la stessa ISA ma avere unità funzionali diverse al suo interno
+  - (10 unità per fare 10 operazioni con interi in un ciclo di clock vs una che ci mette 10 cicli di clock).
+  - La microarchitettura influenza CPI e tempo_di_clock.
+
+OSS: la differenza tra in ordine e superscalare out-of-order è puramente architetturale. Entrambe possono eseguire la stessa ISA
+
+OSS: per continuare a scalare mantenendo l'efficenza, bisogna specializzare le architetture per un determinato workload
 
 # iron law
 abbiamo tre termini, quali termini vengono influenzati dalla tecnologia? quali dall'architettura? quali dall'isa?
-- frequenza di clock 
+- frequenza di clock
   - influenzata dalla tecnologia
 - cpi
   - influenzati dall'isa
@@ -71,6 +81,4 @@ abbiamo tre termini, quali termini vengono influenzati dalla tecnologia? quali d
 - num istruzioni
   - influenzati dall'isa
 
-
-# obiettivi del corso
 
