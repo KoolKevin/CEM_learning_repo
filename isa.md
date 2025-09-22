@@ -83,3 +83,11 @@ In risc-v ci sono 4 modalità di indirizzamento:
         - jal x1, 16        # salta a PC+16 e salva il ritorno in x1 (ra)
         - beq rs1, rs2, L1
     - Tipicamente usato per i salti
+
+
+
+### Floating point
+si usa un register file separato sui cui le istruzioni fp agiscono
+
+
+
