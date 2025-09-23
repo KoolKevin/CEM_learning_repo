@@ -15,7 +15,7 @@ Tali passi sono detti:
 ... varie operazioni che vengono eseguite nei vari stadi ...
 
 
-**NB**: Una cosa importante da capire con il pipelining è che man mano che le istruzioni viaggiano nella pipeline, esse vengono accompagnate da vari valori intermedi che rappresentano una sorta di stato dell'istruzione all'interno della pipeline
+**NB**: Una cosa importante da capire con il pipelining è che man mano che le istruzioni viaggiano nella pipeline, esse vengono accompagnate da vari valori intermedi che rappresentano una sorta di stato dell'istruzione all'interno della pipeline, e che servono all'esecuzione corretta dell'istruzione
 - e.g. A e B vengono generati nello stadio dell'instruction decode; oppure, per un'istruzione di load, l'informazione di quanti byte devo leggere viene propagata a partire dallo stadio di ID fino allo stadio MEM
 - la pipeline ha quindi tanti registri buffer per questi valori intermedi
 - in questo modo ogni istruzione è accompagnata dal suo stato e non da quello di un'altra istruzione

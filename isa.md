@@ -86,6 +86,15 @@ In risc-v ci sono 4 modalità di indirizzamento:
 
 
 
+### Calling convention
+ABI = contratto tra OS e compilatori con ISA riscv
+- i registri sono GP e quindi possono essere usati come si vuole
+- con la ABI si introduce una convenzione in cui i registri hanno dei ruoli ben specifici
+    - in particolare per quanto riguarda il processo di chiamata a funzione
+
+notiamo che per tornare da una funzione possiamo usare solo jalr, mentre jal no
+- questo perchè l'indirizzo di ritorno è disponibile come registro e non come offset
+
 ### Floating point
 si usa un register file separato sui cui le istruzioni fp agiscono
 
