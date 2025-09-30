@@ -40,6 +40,7 @@ In sostanza il valore di un registro sorgente non viene prelevato dal RF (dato c
     - id/ex.rs1(o rs2) == ex/mem.rd || mem/wb.rd 
         - uno dei miei registri sorgente è il registro destinazione di un'istruzione più in fondo nella pipeline
     - notiamo che di nuovo c'è bisogno di propagare dei valori intermedi nella pipeline nei registri buffer degli stadi
+- spiegato meglio, nelle slide...
 
 come si stalla?
 - possiamo modificare l'opcode dell'istruzione da stallare per renderla una nop
