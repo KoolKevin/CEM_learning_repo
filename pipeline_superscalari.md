@@ -1,7 +1,3 @@
-Lo stesso vale anche per pipeline lunghe
-- ho critical path più corti e quindi posso aumentare la frequenza di clock
-- ma ho più alee di dato e quindi il CPI medio si abbassa
-- questo ed altri problemi
 fino ad ora abbiamo visto pipeline scalari
 - un'istruzione alla volta può essere issued
 
@@ -16,22 +12,18 @@ T/S + C
 
 ...
 
-
-
-Con superscalarità il CPI diventa >= 1 / P
-- ottengo uno speedup teorico pari a P!
-
 Abbiamo però delle problematiche:
 - alee strutturali! Se abbiamo un grado di superscalarità pari a 4
-    - abbiamo 4 volte gli stadi di ID e WB che accedono al R
-        - la progettazione logica del RF diventa complessa ed occupa più area dato che dobbiamo pensare 4 porte in lettura e scrittura per accessi contemporanei
+    - abbiamo 4 volte gli stadi di ID e WB che accedono al RF
+        - la progettazione logica del RF diventa complessa ed occupa più area dato che dobbiamo pensare 8 porte in lettura (leggiamo due registri) e 4 porte di scrittura per accessi contemporanei
     - stesso discorso per la MEM
 - alee di controllo
-    - che indirizzi prendiamo in 4 IF contemporanei
+    - che indirizzi prendiamo in 4 IF contemporanei se ci sono delle branch?
 
 Quand'è che architetture superscalari diventano convenienti?
-- specializzare per istruzioni specifiche determinate pipeline rispetto ad altre
-    - es. con grado di superscalarità 2, potremmo mettere su una pipeline le istruzioni intere e sull'altra quelle fp. Queste istruzioni hanno RF separati e quindi non abbiamo alee strutturali (o poche in caso di istruzioni di conversione)
+- **specializzare per istruzioni specifiche determinate pipeline rispetto ad altre**
+    - es. con grado di superscalarità 2, potremmo mettere su una pipeline le istruzioni intere e sull'altra quelle fp.
+    - Queste istruzioni hanno RF separati e quindi non abbiamo alee strutturali (o poche in caso di istruzioni di conversione)
 
 In generale architetture superscalari di grado 2/4 risultano convenienti
 
