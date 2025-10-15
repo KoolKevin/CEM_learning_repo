@@ -188,6 +188,12 @@ Notiamo anche come lo scoreboard gestisce tutti i tipi di alea di dato e le alee
 - WAR hazards (WR):
   - before writing a result, check if any previous instructions that haven’t gone past RO need that register as a source
 
+NB: quand'è che abbiamo una WAR?
+
+- abbiamo un'istruzione di cui è stata fatta issue ma non ancora RO (sta attendendo i suoi operandi)
+- l'istruzione corrente è WR ed ha come registro destinazione uno dei registri sorgente dell'istruzione sopra
+- l'alea si presenta quando l'istruzione che sta attendendo gli operandi ha come opearando sorgente quello destinazione dell'istruzione scrivente, ma non sta attendendo il risultato da quell'unità funzionale
+
 Oss:
 
 - Nella pipeline multiciclo poteva succedere che più istruzioni potessere accedere allo stadio di MEM/WB in contemporanea
@@ -195,6 +201,57 @@ Oss:
 - Ora abbiamo una scoreboard che gestisce questi problemi strutturali / di alee
   - the data structures and the logic of the scoreboard detect and handle hazards
 
+**NB**: interessante notare che mediante lo studio delle dipendenze di dato possiamo definire dei **thread** di istruzioni che devono eseguire in sequenza.
+
+- A noi interessante quindi le dipendenze di dato presenti nel codice che ci definiscono dei DAG per l'ordinamento
+- Non conta più la distanza tra due istruzioni, quello era interessante solamente per lo scheduling statico effettuato da un compilatore per una particolare architettura
+  - e.g. se so che ho una forwarding unit ...
+
+- la microarchitettura si costruisce dei DAG per segnare le istruzioni dipendenti
+- io vado a pescare istruzioni indipendenti da DAG separati
+- se non ci sono abbastanza istruzioni indipendenti stallo
+
 # Scoreboard example
 
-Ma le alee di controllo???
+al secondo ciclo la seconda load non entra in issue dato che l'unità intera è occupata (la prima load non ha ancora eseguito il calcolo dell'immediato)
+
+- NB: notiamo che stalliamo dato che lo scoreboard non ha un parcheggio per la seconda load. Se ci fosse un'altra unità intera non avremmo dovuto stallare
+- al termine del terzo ciclo non posso liberare l'unità intera? NO!
+  - non ho ancora fatto WR e non se riesco a farla subito dopo dato che magari ci sono delle WAR che causano stalli e mi tengono occupata la FU
+
+A quanto pare facciamo il fetch di un'istruzione alla volta
+
+- se c'è uno stallo in issue blocco anche il fetch
+
+Notiamo quello che avevamo già detto
+
+- issue in ordine
+- RO fuori ordine
+
+Nel settimo ciclo la fmul si blocco in RO dato che f2 non è pronto (RAW)
+
+Al ciclo 9, f2 è stato scritto e quindi la dipendenza RAW è stata risolta (non al ciclo 8 dato che in quel ciclo non ho ancora scritto il RF)
+
+- le due istruzioni che stavano aspettando posso entrare in RO (se il RF ha sufficenti porte, altrimenti avremmo un alea strutturale che bloccherebbe uno dei due)
+
+scoreboard (functional unit status) è una CAM
+
+- in Issue ci accediamo per indice di riga, ovvero per FU
+- negli altri stadi ci accediamo per contenuto
+
+# pro e contro scoreboarding
+
+problemi:
+
+- issue in ordine e bloccante
+  - problema principale: stalliamo dato che c'è solo un parcheggio associata ad una FU
+  - le alee strutturali che abbiamo in Issue il più delle volte non corrispondono al fatto che la FU sia veramente occupata; piuttosto, stalliamo dato che non c'è una entry disponibile nello scoreboard
+
+- a volte abbiamo delle alee WAR che si potrebbero evitare se si leggesse il RF quando il dato è disponibile nel RF, invece di aspettare che entrambi gli operandi siano pronti
+  - sarebbe più intelligente salvare in Rj e Rk il valore del registro quando diventa disponibile
+  - Rj e Rk diventa Vj e Vk ovvero delle copie del valore del registro
+  - di fatto stiamo facendo register renaming dato che non stiamo usando più il registro ma una sua copia
+
+pro:
+
+- risolve automaticamente le dipendenze di dato
