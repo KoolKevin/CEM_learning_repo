@@ -216,8 +216,13 @@ Oss:
 al secondo ciclo la seconda load non entra in issue dato che l'unità intera è occupata (la prima load non ha ancora eseguito il calcolo dell'immediato)
 
 - NB: notiamo che stalliamo dato che lo scoreboard non ha un parcheggio per la seconda load. Se ci fosse un'altra unità intera non avremmo dovuto stallare
-- al termine del terzo ciclo non posso liberare l'unità intera? NO!
-  - non ho ancora fatto WR e non se riesco a farla subito dopo dato che magari ci sono delle WAR che causano stalli e mi tengono occupata la FU
+Al termine del terzo ciclo non posso liberare l'unità intera? NO!
+  - non ho ancora fatto WR e non so se riesco a farla subito dopo dato che magari ci sono delle WAR che causano stalli e mi tengono occupata la FU
+  - Perché?
+    - Perché il scoreboard è responsabile di tenere l’unità fino a che il suo risultato non è stato ufficialmente scritto nel registro destinazione.
+    - Finché il risultato non è scritto, l’unità funzionale è l’unico posto dove il risultato “vive” (non c’è un buffer che lo conserva).
+    - Se liberassi l’unità prima del WR, perderesti il riferimento a dove si trova il risultato temporaneo.
+    - Inoltre, il WR potrebbe non avvenire subito (potresti dover stallare per evitare una dipendenza WAR con un’istruzione precedente che deve ancora leggere lo stesso registro).
 
 A quanto pare facciamo il fetch di un'istruzione alla volta
 
@@ -244,8 +249,11 @@ scoreboard (functional unit status) è una CAM
 problemi:
 
 - issue in ordine e bloccante
-  - problema principale: stalliamo dato che c'è solo un parcheggio associata ad una FU
+  - problema principale: stalliamo dato che c'è solo un parcheggio per ogni FU
+    - potremmo aumentare il numero di FU ma questo ha un costo
   - le alee strutturali che abbiamo in Issue il più delle volte non corrispondono al fatto che la FU sia veramente occupata; piuttosto, stalliamo dato che non c'è una entry disponibile nello scoreboard
+    - se lo slot è occupato, non posso emettere una nuova istruzione, anche se fisicamente l’unità potrebbe iniziare a lavorare su un’altra istruzione
+    - ad esempio una load che ha già calcolato l’indirizzo e sta solo aspettando di fare WB, tenendo occupata la entry.
 
 - a volte abbiamo delle alee WAR che si potrebbero evitare se si leggesse il RF quando il dato è disponibile nel RF, invece di aspettare che entrambi gli operandi siano pronti
   - sarebbe più intelligente salvare in Rj e Rk il valore del registro quando diventa disponibile
