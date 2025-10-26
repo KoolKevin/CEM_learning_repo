@@ -30,6 +30,8 @@ Ogni reservation station è una tabella formata da:
 
 Ogni entry nel RF ha un Register Result Status associato analogo a quello dell'algoritmo di scoreboarding
 
+## Issue
+
 Durante l'issue di un'istruzione
 
 - controlliamo se ci sono alee strutturali: c'è qualche reservation station (della FU desiderata) libera?
@@ -53,8 +55,6 @@ Passo da una modalità in cui gli operandi venivano sempre letti dal RF, ad una 
 Sto facendo renaming degli operandi, con il nome del tag
 
 Durante l'issue si segna la entry del RF relativa al registro destinazione dell'istruzione, il tag della reservation station in cui verranno parcheggiata l'istruzione da eseguire. In questo modo si marchia la entry nel RF come invalida (esattamente come avveniva nel register result status dello scoreboarding)
-
-La reservation station si libera quando vede circolare sul CDB il proprio tag -> in WR
 
 slide 9 -> IS al posto di ID
 
@@ -97,10 +97,11 @@ Come mai non ci sono più alee RAW?
 - le entry nel RF possono essere marchiate come valide o non valide grazie al campo Q
 - durante issue copiamo la entry nel RF nella reservation station
 - se uno degli operandi non è valido l'istruzione rimarrà in uno stato di wait nella reservation station fino a quando l'operando sarà disponibile (= prodotto dall'unità funzionale)
-- consideriamo uno stato di attesa nella reservation station dopo issue
+  - consideriamo uno stato di attesa nella reservation station dopo issue
 
 Come mai non ci sono più alee WAW?
 
+- il rischio delle WAW è sovrascrivere un registro con un valore passato
 - se faccio issue di un istruzione con una antidipendenza, nel RF andrò a sovrascrivere il tag dell'istruzione precedente
 - siccome le entry del RF vengono copiate, chi aspettava il tag precedente continua ad aspettarlo quando viene pubblicato sul CDB. Chi aspetta il tag nuovo (vedi RF) non sarà sensibile alla publlicazione sul CDB del risultato associato al vecchio tag
   - è impossibile sovrascrivere il registro con il valore vecchio
@@ -109,20 +110,44 @@ Come mai non ci sono più alee WAW?
 Come mai non ci sono più alee WAR?
 
 - sempre perchè stiamo facendo renaming
+- il rischio delle WAR è leggere il valore nuovo di un registro al posto di quello vecchio
+- nuovamente grazie al meccanismo dei tag e delle **copie dal RF** anche se l'istruzione che legge esegue dopo quella che scrive, la read ha comunque già copiato l'operando nella sua reservation station
 
-# Esempio Tommasulo
+# Concorrenza nell'accesso al RF
 
-in IS
+Abbiamo visto che accediamo al RF
 
-- nel primo semiperiodo controllo se c'è una RS disponibile
-- nel secondo semiperiodo si accede al RF
+- durante issue sia in lettura che scrittura
+- durante WR
 
-in WR
+**NB**: abbiamo scritture e letture concorrenti nel RF
 
-- nel primo semiperiodo si scrive il risultato sul CDB
-- e RF e RF controllano ed eventualmente si aggiornano
+- Potrebbe capitare di terminare un istruzione che scrive il registro r, e ,nello stesso ciclo, contemporaneamente di star effettuando una issue di un istruzione che legge r
 
-NB: questa scelta potrebbe causare stalli aggiuntivi
+Facciamo quindi la stessa assunzione che facevamo nella pipeline semplice dividendo il clock in semiperiodi
+
+- in IS
+  - nel primo semiperiodo controllo se c'è una RS disponibile
+  - nel secondo semiperiodo si accede al RF (sia per la copia che per la scrittura del tag)
+- in WR
+  - nel primo semiperiodo si scrive il risultato sul CDB
+  - e RF e RS controllano ed eventualmente si aggiornano
+
+# Quando si popolano/liberano le reservation station?
+
+La reservation station si occupa durante issue nel secondo sempiperiodo dopo che si sono copiati gli operandi dal RF
+
+La reservation station si libera quando vede circolare sul CDB il proprio tag -> in WR
+
+- Facciamo poi l'assunzione che la reservation station sia libera solo a partire del secondo semiperiodo dello stadio di writeback
+- questo perchè nel primo semiperiodo stanno circolando dei dati nel CDB che aggiornano le RS
+
+Durante WR abbiamo quindi che le RS:
+
+- usano il primo sempiperiodo per fare sampling del CDB (ed eventualmente liberarsi)
+- sono libere solo dal secondo semiperiodo in poi
+
+**NB**: questa scelte potrebbe causare stalli aggiuntivi (controllo se le RS sono libere nel primo semiperiodo, ma le libero solo nel seconod) ma evita corse critiche
 
 # Tommasulo vs scoreboarding
 
@@ -139,7 +164,8 @@ NB: questa scelta potrebbe causare stalli aggiuntivi
   - le reservation station delle store contengono
     - la stessa roba ma con due q e v dato che ho due registri sorgente
 
-  - **NB**: le reservation station per le load/store devono rispettare delle logiche di ordinamento e quindi diventano delle code/buffer nel senso che le entry nella reservation station vengono messe in esecuzion in ordine
+  - **NB**: le reservation station per le load/store devono rispettare delle logiche di ordinamento e quindi diventano delle **code/buffer**
+    - nel senso che le entry nella reservation station vengono messe in esecuzion in ordine
     - le reservation station per l'unità load/store vengono gestite in maniera particolare a causa di questi vincoli di ordinamento
 
 ## Chiedi per instruction queue. Non facevamo fetch di un'istruzione alla volta?
