@@ -1,0 +1,3 @@
+...
+
+formula ricorsiva per il tempo di accesso
