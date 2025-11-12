@@ -91,7 +91,7 @@ La politica LRU soffre di pattern di accesso patologici (ciclici e periodici) ch
 - A, B, C, D, E, A, ...
 - sostituisco proprio il blocco che mi serve per il prossimo accesso
 
-Set thrashing:
+**Set thrashing**:
 
 - When the “program working set” in a set is larger than set associativity
   - program working set == insieme degli indirizzi a cui il programma accede
@@ -99,6 +99,7 @@ Set thrashing:
   - Tutti quei blocchi competono per lo stesso set.
   - La cache deve continuamente sostituire blocchi nel set, anche se altri set restano inutilizzati.
   - Il risultato è un alto tasso di miss, anche se la cache nel complesso non è piena (situazione simile a conflict-misses)
+- in generale è quando un accesso invalida quello precedente ciclicamente
 - Random replacement policy is better when thrashing occurs
 
 In practice:
@@ -134,3 +135,34 @@ I primi livelli sono sicuramente separati, tuttavia dal secondo livello in poi v
 
 - l'overhead di avere cache separate consiste in: frammentazione e area occupata maggiore a parità di dimensione
 - unificarle quando cominciano ad essere grandi diventa conveniente
+
+# Esempi
+
+notare che nel secondo esempio con le miss, l'avere la cache porta a:
+
+- spostare 32byte dalla memoria nella cache rispetto a 8 se non l'avessimo avuto
+  - banda maggiore utilizzata
+- avere una latenza maggiore dato che dobbiamo controllare prima la cache della memoria
+
+in questo caso di alto miss-rate l'avere la cache è peggio che non averla
+
+...
+
+Con blocchi di dimensione maggiore il numero di set diminuisce (a parità di dimensione della cache)
+
+- questo significa che conflitti diventano più probabili
+- località temporale peggiora
+  - diventa più probabile che qualcuno spinga via il mio blocco
+  - località temporale peggiore significa più miss dovute a conflitti
+- località spaziale migliore
+  - località spaziale peggiore significa più miss compulsorie
+
+Miss compulsory
+
+- miss causate dal primo accesso ad un determinato blocco che non è ancora mai stato caricato in cache
+- avvengono la prima volta che la cpu accede ad un determinato blocco
+- sono inevitabili
+
+miss di capacità sono quelle dovute a working set troppo grandi anche per cache ad associatività completa
+
+anche per cache ad associatività completa, è possibile ad avere delle miss di conflitto a causa della politica di replacement
