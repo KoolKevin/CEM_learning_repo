@@ -140,7 +140,7 @@ I primi livelli sono sicuramente separati, tuttavia dal secondo livello in poi v
 
 notare che nel secondo esempio con le miss, l'avere la cache porta a:
 
-- spostare 32byte dalla memoria nella cache rispetto a 8 se non l'avessimo avuto
+- spostare 32byte dalla memoria nella cache rispetto a 8 se non l'avessimo avuta
   - banda maggiore utilizzata
 - avere una latenza maggiore dato che dobbiamo controllare prima la cache della memoria
 
@@ -148,21 +148,81 @@ in questo caso di alto miss-rate l'avere la cache è peggio che non averla
 
 ...
 
-Con blocchi di dimensione maggiore il numero di set diminuisce (a parità di dimensione della cache)
+# I vari tipi di miss
 
-- questo significa che conflitti diventano più probabili
-- località temporale peggiora
-  - diventa più probabile che qualcuno spinga via il mio blocco
-  - località temporale peggiore significa più miss dovute a conflitti
+1. Miss obbligatorie (Compulsory miss)
+    - first reference to a block always results in a miss
+    - è impossibile avere una hit su un blocco che non ho mai caricato in cache
+
+2. Miss di Capacità (Capacity miss)
+    - cache is too small to hold the program working set (la cache è piena)
+    - qualcosa verrà per forza evictato e al prossimo riferimento si avrà una miss
+
+3. Miss di Conflitto (Conflict miss)
+    - defined as any miss that is neither a compulsory nor a capacity miss
+    - causate da un numero di vie troppo limitato della cache
+    - anche se c'è spazio in cache, non sono riuscito a mantenere il mio blocco in cache dato che è stato sostituito da un altro con lo stesso set-id. Al prossimo riferimento avrà una miss
+
+## Iperparametri delle cache
+
+Con blocchi di dimensione maggiore
+
+- **il numero di set diminuisce (a parità di dimensione della cache)**
 - località spaziale migliore
-  - località spaziale peggiore significa più miss compulsorie
+  - meno miss compulsorie
+- località temporale peggiora
+  - diventa più probabile che qualcuno spinga via il mio blocco -> miss di capacità
+  - diventano più probabili anche i conflitti (ho meno set-id) -> miss di conflitto
+- C'è un tradeoff nella scelta della dimensione del blocco
+  - Blocchi troppo piccoli non sfruttano bene la località spaziale
+  - Blocchi troppo larghi -> tanto replacement -> non sfrutta bene la località temporale
 
-Miss compulsory
+Con cache di dimensione maggiore
 
-- miss causate dal primo accesso ad un determinato blocco che non è ancora mai stato caricato in cache
-- avvengono la prima volta che la cpu accede ad un determinato blocco
-- sono inevitabili
+- si ha più località temporale dato che i dati rimangono in cache per più tempo prima di essere rimpiazzati (se associatività sufficentemente alta)
+- quelle che prima sarebbero state miss di capacità diventano hit
+- cache più grandi hanno anche latenze più elevate e quindi c'è un tradeoff
+  - cache troppo piccole rimpiazzano costantemente i dati utili
+  - cache troppo grandi hanno latenze elevate anche in caso di hit
+  - la grandezza della cache dovrebbe essere grande tanto quanto il working set e non di più
 
-miss di capacità sono quelle dovute a working set troppo grandi anche per cache ad associatività completa
+Grado di associatività
 
-anche per cache ad associatività completa, è possibile ad avere delle miss di conflitto a causa della politica di replacement
+- Larger associativity
+  - minore miss rate (reduce i conflitti)
+  - maggiore hit latency e costo area (plus diminishing returns)
+- Smaller associativity
+  - minor costo
+  - minore hit latency
+  - Molto importante per L1 caches
+
+## Come ridurrre i vari tipi di miss
+
+per ridurre le miss compulsorie:
+
+- aumentare la dimensione del blocco può aiutare se si ha alta località spaziale nel pattern di accesso del programma
+- Prefetching: Anticipate which blocks will be needed soon
+
+per ridurre miss di conflitto:
+
+- aumentare associatività della cache
+
+per ridurre miss di capacità:
+
+- Utilize cache space better: keep blocks that will be referenced again in cache
+- questo si traduce in:
+  - usare politica LRU per rimuovere il blocco con meno probabilità di essere riutilizzato (quello con meno località temporale)
+  - Software management: divide working set and computation such that each “computation phase” fits in cache
+  - Al termine di ogni computation fase possiamo caricare la cache con un nuovo mini-working set (pagando le miss compulsorie) e dimenticarci dei dati precedenti che non verranno più referenziati
+
+# Software Approaches for Higher Hit Rate
+
+esempio slide 54: notare come ci siano solo miss compulsorie dato che ogni dato viene acceduto (doppiamente) solo una volta
+
+esempio matmul:
+
+- z non ha località spaziale dato che viene acceduto sulla colonna
+- vogliamo quindi cercare di farcelo stare in cache per sfruttare località temporale
+- sfruttiamo tiling per diminuire la dimensione del working set e diminuire le miss di capacità (?)
+
+trasformare array di strutture in strutture di array
