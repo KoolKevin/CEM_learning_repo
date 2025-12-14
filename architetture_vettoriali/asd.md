@@ -126,3 +126,13 @@ una lane è:
 
 - una porzione di VRF
 - un gruppo di functional unit che permettono di svolgere tutte le operazione dell'instruction set
+
+## Vector startup latency
+
+due istruzioni vettoriali che utilizzano la stessa functional unit non possono eseguire immediatamente una dopo l'altra
+
+la seconda istruzione vettoriale deve aspettare che:
+
+- la prima abbia finito di processare di emettere gli elementi del suo vettore
+- l'ultimo elemento del vettore precedente sia uscito dalla FU (la pipeline si deve svuotare)
+  - penso per evitare complicazioni hardware
