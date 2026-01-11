@@ -161,7 +161,8 @@ adesso abbiamo delle cache write-back
 le scritture adesso modificano solo la cache e non la memoria. In caso di write miss leggiamo la memoria con la busRdX
 ```
 
-NB: il cache controller, prima di sapere in che stato si trova un determinato blocco nella cache, ha bisogno di attivare la logica che controlla se si ha una hit o una miss
+n
+**NB**: il cache controller, **prima di sapere in che stato si trova un determinato blocco nella cache, ha bisogno di attivare la logica che controlla se si ha una hit o una missn**
 
 - questo significa che anche operazioni che sembrano non avere alcun effetto (vedi PrRead o BusRd) in realtà effettuano comunque questa operazione che controlla se il blocco è nella cache o meno
 - d'altronde l'informazione sullo stato corrente è presente nei bit di stato presenti nel tag store
@@ -177,7 +178,8 @@ Abbiamo chiamato shared lo stato che mi dice che ho una copia non dirty del dato
 Tutte le volte che modifico il dato nello stato shared devo per forza notificare gli altri che sto scrivendo.
 
 - se hanno una copia anche loro devono invalidarla e quindi questo broadcast è servito
-- se invece non ce l'hanno devono comunque attivare la logica di hit, questo potrebbe essere evitato se si aggiungesse uno stato che codifica lo stato in cui sono l'unico ad avere una copia non dirty
+- se invece non ce l'hanno devono comunque attivare la logica di hit
+- questo potrebbe essere evitato se si aggiungesse uno stato che codifica lo stato in cui sono l'unico ad avere una copia non dirty
 - inoltre, siccome le richieste passano per lo snoopy-bus che serializza, serializziamo di più le richieste
 
 # MESI

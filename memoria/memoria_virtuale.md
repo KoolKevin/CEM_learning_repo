@@ -118,7 +118,7 @@ abbiamo che le cache contengono indirizzi fisici già tradotti
 
 la MMU contiene 4 cose
 
-- un indirizzo che contiene l'indirizzo base della tabella delle pagine
+- un registro che contiene l'indirizzo base della tabella delle pagine
 - una logica che fa  page table walking
 - TLB
 - una logica che solleva una eccezione in caso di mancata traduzione durante il page table walk o in caso di violazione dei bit di accesso
@@ -157,22 +157,20 @@ accedo alla cache con indirizzi fisici o virtuali?
   - prima di accedere alla cache devo fare la traduzione e quindi aspetto un sacco
 - se uso indirizzi virtuali
   - ho omonimi e sinonimi
-  - se ho una cache con indirizzi virtuali **devo fare flush ad ogni context switch**
-
-**NB**: nelle cache completamente virtuali sono solo gli omonimi che causano problemi
-
-- se lo stesso VA può puntare a PA diversi (dati diversi) in caso di context switch, la cache conterrà un dato stale ma **ci sarà comunque un hit dato che il VA è lo stesso**
+  - in particolare sono gli omonimi ad essere problematici dato che mi faccio hit ma accedo ad un indirizzo di un altro processo
+  - **devo fare flush ad ogni context switch**
+    - se lo stesso VA può puntare a PA diversi (dati diversi) in caso di context switch, la cache conterrà un dato stale ma **ci sarà comunque un hit dato che il VA è lo stesso**
 
 ## VIPT caches
 
 Virtual-physical caches sono molto comuni per L0
 
-Siccome l'accesso a una cache ha due stadi (selezione del set e controllo del tag), e dato che solamente dopo aver selezionato il set possiamo controllare il tag, nelle VIPT caches l'idea è **tradurre l'indirizzo contemporaneamente alla selezione del set e poi confrontare i tag dei risultati**
+Siccome l'accesso a una cache ha due stadi (selezione del set e controllo del tag), e dato che **solamente dopo aver selezionato il set possiamo controllare il tag**, nelle VIPT caches l'idea è **tradurre l'indirizzo contemporaneamente alla selezione del set e poi confrontare i tag dei risultati**
 
-- accesso contemporaneo a cache e TLB
+- **accesso contemporaneo a cache e TLB**
 - virtual tag e physical index
   - nel mentre si accede al set con i bit di indice, contemporaneamente si svolge la traduzione dei bit di tag
-- **NB**: questa cosa funziona bene se la capacità della cache rispetta la condizione, ovvero se i bit di indice ricadono tutti nei bit di page offset e **quindi non cambiano tra indirizzo virtuale e fisico**
+- **NB**: questa cosa funziona bene se la capacità della cache rispetta la condizione, ovvero **se i bit di indice ricadono tutti nei bit di page offset e quindi non cambiano tra indirizzo virtuale e fisico**
   - siccome i bit di indice non cambiano, è come se stessimo accedendo alla cache dopo aver fatto la truduzione dell'indirizzo virtuale
   - i bit di tag sono invece quelli dell'indirizzo fisico (d'altronde se abbiamo una miss, abbiamo anche tempo di fare la traduzione)
   - questo è il motivo per cui le cache di livello 0 hanno la stessa dimensione da anni, sono vincolate dalla formula vista sopra (pagine fisse a 4k)

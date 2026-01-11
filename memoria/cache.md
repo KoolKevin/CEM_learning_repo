@@ -33,7 +33,7 @@ Addresses with same index contend for the same location
 
 ## Associative
 
-chiamiamo una riga (blocco) nella cache come **set**
+chiamiamo una riga nella cache come **set**
 
 - con i bit di indice identifichiamo un set all'interno della cache
 - con la cache directly mapped un set corrisponde ad un blocco
@@ -82,14 +82,14 @@ In generale le politiche di eviction sono due:
 
 - random
 - o LRU
-  - con la logica che se non uso questo blocco da un po', probabilmente ho finito di utilizzarlo
+  - la logica è che se non uso un blocco da un po', probabilmente ho finito di utilizzarlo
 
 ### LRU o Random?
 
 La politica LRU soffre di pattern di accesso patologici (ciclici e periodici) che portano ad avere un hit-rate pari a 0
 
 - A, B, C, D, E, A, ...
-- sostituisco proprio il blocco che mi serve per il prossimo accesso
+- con E sostituisco proprio il blocco che mi serve per il prossimo accesso
 
 **Set thrashing**:
 
@@ -180,7 +180,7 @@ Con blocchi di dimensione maggiore
 Con cache di dimensione maggiore
 
 - si ha più località temporale dato che i dati rimangono in cache per più tempo prima di essere rimpiazzati (se associatività sufficentemente alta)
-- quelle che prima sarebbero state miss di capacità diventano hit
+  - quelle che prima sarebbero state miss di capacità diventano hit
 - cache più grandi hanno anche latenze più elevate e quindi c'è un tradeoff
   - cache troppo piccole rimpiazzano costantemente i dati utili
   - cache troppo grandi hanno latenze elevate anche in caso di hit

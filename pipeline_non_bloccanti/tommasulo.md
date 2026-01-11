@@ -1,10 +1,26 @@
+se una LOAD va in cache miss l'istruzione successiva che usa quel registro stalla bloccando la pipeline.
+
+con scheduling dinamico, in caso di una cache miss, le istruzioni indipendenti successive possono comunque fare issue ed eseguire
+
+il processore può nascondere (hide) la latenza della cache miss, eseguendo altro lavoro utile
+
+---
+
 Nel primo esempio con scoreboarding, la fsub non riesce a completare issue al ciclo 3 dato che trova l'unità funzionale occupata nella entry dello scoreboard, nonostante la FU non sia effettivamente occupata.
 
 - **alea strutturale sull'unità scoreboard**, non sulla FU
 
 Secondo esempio
 
+- l'alea WAW non mi permette di fare issue della add nonostante sia indipendente
+
 Nel terzo esempio siamo obbligati a eseguire le istruzioni in quell'ordine a causa del dataflow. Rinominando i registri risolviamo le dipendenze di nome e possiamo eseguire fuori ordine
+
+**Cosa migliora Tomasulo rispetto a scoreboarding?**
+
+- Elimina completamente WAW and WAR hazards through Renaming of registers
+- grazie all'impiego di più reservation station per la stessa FU, permette di fare issue e di mandare in esecuzione un'istruzione anche quando un'altra dello stesso tipo è in stallo a causa di una RAW
+  - meno alee strutturali
 
 # Algoritmo di Tommasulo
 
@@ -36,7 +52,7 @@ Durante l'issue di un'istruzione
 
 - controlliamo se ci sono alee strutturali: c'è qualche reservation station (della FU desiderata) libera?
 - copiamo il valore dei registri sorgente (incluso il tag Q) nelle entry della reservation station
-- aggiorniamo il RF marchiando il registro sorgente come invalido e scrivendo il tag della reservation station
+- aggiorniamo il RF marchiando il registro destinazione come invalido scrivendo il tag della reservation station
 - **NB**: adesso, in issue copiamo e basta dal RF, l'unico controllo che facciamo è quello sulla disponibilità di una reservation station
 - **NB2**: notiamo che in Tommasulo non abbiamo più uno stadio di read operands distinto
   - leggiamo gli operandi (oppure il tag di chi li produce) durante issue quando copiamo dal RF
@@ -54,7 +70,7 @@ Passo da una modalità in cui gli operandi venivano sempre letti dal RF, ad una 
 
 Sto facendo renaming degli operandi, con il nome del tag
 
-Durante l'issue si segna la entry del RF relativa al registro destinazione dell'istruzione, il tag della reservation station in cui verranno parcheggiata l'istruzione da eseguire. In questo modo si marchia la entry nel RF come invalida (esattamente come avveniva nel register result status dello scoreboarding)
+Durante l'issue si segna la entry del RF relativa al registro destinazione dell'istruzione con il tag della reservation station in cui verrà parcheggiata l'istruzione da eseguire. In questo modo si marchia la entry nel RF come invalida (esattamente come avveniva nel register result status dello scoreboarding)
 
 slide 9 -> IS al posto di ID
 
@@ -71,7 +87,7 @@ nel caso di istruzioni di store, oltre all'indirizzo con cui vogliamo accedere a
 
 Questo potrebbe essere una entry nel RF, oppure tag per reservation station che mi produrranno il risultato
 
-l'ordine delle istruzioni di load/store viene serializzato dalla address unit
+l'ordine delle istruzioni di load/store viene serializzato dalla address unit che calcola l'effective address
 
 - l'ordine del programma viene rispettato
 
@@ -128,16 +144,16 @@ Facciamo quindi la stessa assunzione che facevamo nella pipeline semplice divide
 
 - in IS
   - nel primo semiperiodo controllo se c'è una RS disponibile
-  - nel secondo semiperiodo si accede al RF (sia per la copia che per la scrittura del tag)
+  - nel secondo semiperiodo si accede al RF (sia per la copia degli operandi che per la scrittura del tag nel registro destinazione)
 - in WR
   - nel primo semiperiodo si scrive il risultato sul CDB
-  - e RF e RS controllano ed eventualmente si aggiornano
+  - e RF e RS controllano ed eventualmente si aggiornano nel secondo semiperiodo
 
 # Quando si popolano/liberano le reservation station?
 
 La reservation station si occupa durante issue nel secondo sempiperiodo dopo che si sono copiati gli operandi dal RF
 
-La reservation station si libera quando vede circolare sul CDB il proprio tag -> in WR
+La reservation station si libera quando vede circolare sul CDB il proprio tag -> dopo WR
 
 - Facciamo poi l'assunzione che la reservation station sia libera solo a partire del secondo semiperiodo dello stadio di writeback
 - questo perchè nel primo semiperiodo stanno circolando dei dati nel CDB che aggiornano le RS
@@ -149,9 +165,7 @@ Durante WR abbiamo quindi che le RS:
 
 **NB**: questa scelte potrebbe causare stalli aggiuntivi (controllo se le RS sono libere nel primo semiperiodo, ma le libero solo nel seconod) ma evita corse critiche
 
-# Tommasulo vs scoreboarding
-
-...
+---
 
 - con Tommasulo abbiamo una logica per le gestione degli accessi alla memoria
   - operazioni di load/store producono risultati che vengono propagati sul CDB
@@ -167,5 +181,3 @@ Durante WR abbiamo quindi che le RS:
   - **NB**: le reservation station per le load/store devono rispettare delle logiche di ordinamento e quindi diventano delle **code/buffer**
     - nel senso che le entry nella reservation station vengono messe in esecuzion in ordine
     - le reservation station per l'unità load/store vengono gestite in maniera particolare a causa di questi vincoli di ordinamento
-
-## Chiedi per instruction queue. Non facevamo fetch di un'istruzione alla volta?
