@@ -1,4 +1,4 @@
-L'architettura di Tommasulo che abbiamo visto stalliamo solo nel caso di alee strutturali
+L'architettura di Tommasulo che abbiamo visto stalliamo solo nel caso di alee strutturali e di controllo
 
 Inoltre, fino ad adesso abbiamo visto che le istruzioni fanno
 
@@ -77,16 +77,18 @@ Four fields:
 Reorder buffer contiene anche un vettore di flag che mi dicono se quell'istruzione ha generato un'eccezione o meno
 
 - **NB**: in questo senso notiamo che il sollevamento di un'eccezione è anch'esso una modifica dello stato della CPU è va portato a termine solo se l'istruzione che ha sollevato l'eccezione andava effettivamente esecuita (per questo il reorder buffer contiene anche quest'informazione)
-- non chiamiamo l'interrupt service routing fino a che non siamo sicuri che quell'istruzione la dovevamo eseguire o meno (commit)
+- non chiamiamo l'interrupt service routine fino a che non siamo sicuri che quell'istruzione la dovevamo eseguire o meno (commit)
 
-Il reorder buffer ha delle entry che vengono allocate durante issue
+Il reorder buffer ha delle entry che vengono **allocate durante issue**
 
 - **possiamo quindi avere alee strutturali** come con le reservation station
 - non c'è spazio quando head == tail (buffer circolare)
 
+### Modifiche importanti
+
 L'introduzione del ROB richiede di modificare le reservation stations:
 
-- Operand source is now reorder buffer instead of functional unit
+- Operand source is now reorder buffer instead of functional unit (reservation station tag)
 
 Il CDB non scrive più valori nel RF e nelle store unit (che vuol dire fare commit delle istruzioni).
 
@@ -96,7 +98,7 @@ Il CDB non scrive più valori nel RF e nelle store unit (che vuol dire fare comm
 ### Funzionamento ROB
 
 - Viene caricato in ordine dallo stadio ID contestualmente con il caricamento della Reservation Station
-- Nell’intervallo tra il completamento dell’esecuzione e la fase di commit, il ROB e non il register file mette a disposizione i risultati
+- Nell’intervallo tra il completamento dell’esecuzione e la fase di commit, il ROB (e non il register file) mette a disposizione i risultati
   - Pertanto: Il TAG: (Unit_ID, RS_ID) diventa: TAG: (Indice nel ROB)
 - Il risultato di una istruzione diventa “impegnativo”, cioè passa ad aggiornare lo stato del “sistema” se:
   - L’istruzione è stata eseguita
@@ -128,6 +130,7 @@ non aggiorno i registri quando la FU genera un valore
 
 L'avere i commit in ordine mi permette di sapere se un'istruzione è speculativa
 
-- inoltre mi semplifica la gestione delle eccezioni
+- se una istruzione arriva alla testa del ROB allora non è più speculativa dato che branch precedenti hanno già fatto il commit e non hanno fatto flush
+- inoltre mi semplifica la gestione delle eccezioni rendendole precise
 
 ## Esempio

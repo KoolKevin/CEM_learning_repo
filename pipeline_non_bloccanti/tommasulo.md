@@ -143,11 +143,11 @@ Abbiamo visto che accediamo al RF
 Facciamo quindi la stessa assunzione che facevamo nella pipeline semplice dividendo il clock in semiperiodi
 
 - in IS
-  - nel primo semiperiodo controllo se c'è una RS disponibile
+  - nel primo semiperiodo controllo se c'è una RS disponibile, e nel caso la occupo
   - nel secondo semiperiodo si accede al RF (sia per la copia degli operandi che per la scrittura del tag nel registro destinazione)
 - in WR
   - nel primo semiperiodo si scrive il risultato sul CDB
-  - e RF e RS controllano ed eventualmente si aggiornano nel secondo semiperiodo
+  - nel secondo semiperiodo RF e RS controllano ed eventualmente si aggiornano
 
 # Quando si popolano/liberano le reservation station?
 
