@@ -1,34 +1,43 @@
 # end of Dennard Scaling
+
 ricorda la formula per la potenza di un transitor: `P = alpha*C*V^2*f`
 
 Il Dennard Scaling (1974) diceva che se rimpicciolivi i transistor (riducendo la lunghezza del canale L, e lo spessore dell’ossido di gate), allora:
+
 - la tensione di alimentazione V poteva essere ridotta proporzionalmente,
 - la corrente e la potenza per unità di area restavano costanti,
 - la frequenza di clock poteva aumentare,
 - quindi la potenza totale del chip rimaneva gestibile.
 
 In pratica:
-- diminuire le dimensioni del transistor mi riduce proporzionalmente la capacità -> posso raddoppiare la frequenza
-- con transistor grandi la metà, posso mettercene il quadruplo nella stessa area -> questo fattore viene compensato con il dimezzamento della tensione
+
+- dimezzare le dimensioni del transistor mi riduce proporzionalmente la capacità e la tensione
+  - posso raddoppiare la frequenza compensando la capacità ridotta
+  - con transistor grandi la metà, posso mettercene il quadruplo nella stessa area -> questo fattore viene compensato con il dimezzamento della tensione
+- **la portenza consumata rimane la stessa**
 
 Negli anni 2000 è arrivato il limite fisico dello spessore dell’ossido di gate:
+
 - Non si può renderlo infinitamente sottile (si è arrivati a pochi atomi di spessore).
-- Se diventa troppo sottile, gli elettroni attraversano l’ossido per effetto tunnel → grandi correnti di perdita (leakage).
-- Quindi non si può più abbassare la tensione di alimentazione V senza peggiorare la stabilità e le perdite.
+  - Se diventa troppo sottile, gli elettroni attraversano l’ossido per effetto tunnel → grandi correnti di perdita (leakage).
+- Quindi **non si può più abbassare la tensione di alimentazione V** senza peggiorare la stabilità e le perdite.
 
 Tuttavia si può continuare a rimpicciolire i transitor in lunghezza e larghezza
+
 - il fattore capacità nella formula della potenza dinamica viene ridotto
 - la legge di moore continua ad essere valida (seppur rallentata)
 
 Cosa comporta questo
+
 - V non scende più come dovrebbe → la potenza dinamica 𝑃 ∝ 𝑉^2 x 𝑓 x 𝐶  non si riduce abbastanza.
 - La frequenza di clock f non può crescere (perché più frequenza = più calore).
 
 Risultato: i transistor continuano a diventare più piccoli, ma i chip scaldano troppo se proviamo a seguire la vecchia legge di Dennard.
 
 **Come si è andati avanti**
+
 - Non potendo più aumentare la frequenza, si è aumentato il numero di core per chip
-    - questo fa crescere la potenza linearmente compensando la diminuizione legata alla riduzione della lunghezza
+  - questo fa crescere la potenza linearmente compensando la diminuizione legata alla riduzione della lunghezza
 - nasce la programming crisis (serve parallelizzare i software).
 
 L’ = L / 2 → dimezzo la lunghezza del canale.
@@ -42,24 +51,27 @@ P’ = P → la potenza rimane costante, anche se ho più transistor e più velo
 V’ = V / 2 → do not hold anymore!
 
 Quindi, in realtà:
+
 V’ ≈ V (non dimezza più).
 F’ ≈ F × 2 → la frequenza teoricamente potrebbe crescere, ma nella pratica è limitata dal calore.
 D’ = 4D → la densità di transistor continua ad aumentare.
+    - se ce ne metto quattro volte nella stessa area, adesso consumo 4 volte di più dato che non posso più abbassare la tensione per compensare
 P’ = 4P → qui sta la catastrofe: la potenza per unità di area esplode!
 
-
 # architetture moderne
+
 ARCHITETTURA DELLA CPU
 L’architettura della CPU è definita dalla seguente terna:
--  Il set di istruzioni
-  - architettura vista dall’utente detta anche ISA (Instruction Set Architecture) o linguaggio macchina
+
+- Il set di istruzioni
+- architettura vista dall’utente detta anche ISA (Instruction Set Architecture) o linguaggio macchina
 - La struttura interna
   - Uno stesso set di istruzioni può essere realizzato con strutture interne diverse (es. x86-64, ARMv8, ARMv7, RISC-V).
 - La realizzazione circuitale (**tecnologia microelettronica** impiegata nella realizzazione)
   - La stessa struttura interna può essere realizzata con tecnologie diverse (es. Haswell, Zen, Zen2, Zen3)
 
-
 ### Microarchitettura
+
 - implementazione dell'ISA.
 - microarchitetture diverse possono implementare la stessa ISA ma avere unità funzionali diverse al suo interno
   - (10 unità per fare 10 operazioni con interi in un ciclo di clock vs una che ci mette 10 cicli di clock).
@@ -70,7 +82,9 @@ OSS: la differenza tra in ordine e superscalare out-of-order è puramente archit
 OSS: per continuare a scalare mantenendo l'efficenza, bisogna specializzare le architetture per un determinato workload
 
 # iron law
+
 abbiamo tre termini, quali termini vengono influenzati dalla tecnologia? quali dall'architettura? quali dall'isa?
+
 - frequenza di clock
   - influenzata dalla tecnologia
 - cpi
@@ -80,5 +94,3 @@ abbiamo tre termini, quali termini vengono influenzati dalla tecnologia? quali d
     - considera per esempio un architettura che mi fa stallare molto a confronto con una che evita stalli
 - num istruzioni
   - influenzati dall'isa
-
-
