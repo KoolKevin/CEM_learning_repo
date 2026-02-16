@@ -96,7 +96,7 @@ Come possiamo incrementare la banda permettendo a dispositivi indipendenti di co
 
 # Interrupt controllers
 
-(notare la sintassi delle porte;  -> == porta iniziatore, <- == porta target)
+(notare la sintassi delle porte;  -> = porta iniziatore, <- = porta target)
 
 serializza più richieste di interrupt su un unico filo, e fornisce un indice che definisce quale dispositivo (filo, linea di interrupt) ha generato l'interrupt
 
